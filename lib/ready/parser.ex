@@ -83,4 +83,24 @@ defmodule Ready.Parser do
 
     {Enum.reverse(array_items), remaining}
   end
+
+  # when commands have no prefix!
+  def do_parse(inline_commands) do
+    commands = String.split(inline_commands, "\r\n")
+
+    split_commands =
+      Enum.map(commands, fn
+        command ->
+          String.split(command, " ")
+      end)
+      |> Enum.filter(fn
+        [""] ->
+          nil
+
+        _otherwise ->
+          true
+      end)
+
+    {split_commands, ""}
+  end
 end

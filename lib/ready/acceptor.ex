@@ -15,8 +15,15 @@ defmodule Ready.Acceptor do
   def loop(socket, transport) do
     case :gen_tcp.recv(socket, 0) do
       {:ok, bytes} ->
-        command = Ready.Parser.parse(bytes)
-        response = Ready.Redis.op(command)
+        response =
+          case Ready.Parser.parse(bytes) do
+            [command | _] = commands when is_list(command) ->
+              Enum.map(commands, &Ready.Redis.op/1)
+
+            command ->
+              Ready.Redis.op(command)
+          end
+
         :gen_tcp.send(socket, response)
         loop(socket, transport)
 

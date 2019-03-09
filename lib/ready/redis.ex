@@ -26,4 +26,17 @@ defmodule Ready.Redis do
         @null
     end
   end
+
+  def op(["PING"]) do
+    ["+PONG", @crlf]
+  end
+
+  def op(["PING", message]) do
+    message <> @crlf
+  end
+
+  # redis-cli sends this when it starts
+  def op(["COMMAND"]) do
+    "*0" <> @crlf
+  end
 end
